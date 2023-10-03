@@ -9,13 +9,15 @@ import { updateId, updateTitle, updateDescription } from './Reducer/dataReducer'
 
 import { useReadDataQuery, useCreateDataMutation, useDeleteDataMutation, useUpdateDataMutation } from './Api/dataApi';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   const [id, setId] = useState();
   const [title, setTitle] = useState();
   const [description, setDescription] = useState();
-
   const data = useSelector(state => state.datas);
-  
+
   const dispatch = useDispatch();
 
   const { data: serverData, refetch: readData } = useReadDataQuery(id);
@@ -49,16 +51,24 @@ function App() {
   };
 
   const onCreate = async () => {
-    await createData({ id, title, description });
+    await createData({ id, title, description }).unwrap().then(() => {
+      toast("Data Created!");
+    });
   };
   const onRead = async () => {
-    await readData(id);
+    await readData(id).unwrap().then(() => {
+      toast("Data Readed!");
+    });
   };
   const onUpdate = async () => {
-    await updateData({ id, title, description });
+    await updateData({ id, title, description }).unwrap().then(() => {
+      toast("Data Updated!");
+    });
   };
   const onDelete = async () => {
-    await deleteData(id);
+    await deleteData(id).unwrap().then(() => {
+      toast("Data Deleted!");
+    });
   };
 
   return (
@@ -103,6 +113,7 @@ function App() {
           <Button className='w-100 btn btn-danger' onClick={() => onDelete()}>Delete</Button>
         </Col>
       </Row>
+      <ToastContainer />
     </Container>
   );
 }
