@@ -3,10 +3,11 @@ import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import './App.css';
 
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { updateId, updateTitle, updateDescription } from './Reducer/dataReducer';
+
+import { useReadDataQuery, useCreateDataMutation, useDeleteDataMutation, useUpdateDataMutation } from './Api/dataApi';
 
 function App() {
   const [id, setId] = useState();
@@ -17,6 +18,11 @@ function App() {
   
   const dispatch = useDispatch();
 
+  const { data: serverData, refetch: readData } = useReadDataQuery(id);
+  const [ createData, { isLoading: isCreateLoading } ] = useCreateDataMutation();
+  const [ deleteData, { isLoading: isDeleteLoading } ] = useDeleteDataMutation();
+  const [ updateData, { isLoading: isUpdateLoading } ] = useUpdateDataMutation();
+
   useEffect(() => {
     setId(data.id);
     setTitle(data.title);
@@ -24,8 +30,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
+    setId(serverData.id);
+    setTitle(serverData.title);
+    setDescription(serverData.description);
+  }, [serverData]);
 
   const onChangeId = (e) => {
     setId(e.target.value);
@@ -40,10 +48,18 @@ function App() {
     dispatch(updateDescription(e.target.value));
   };
 
-  const onCreate = () => {};
-  const onRead = () => {};
-  const onUpdate = () => {};
-  const onDelete = () => {};
+  const onCreate = async () => {
+    await createData({ id, title, description });
+  };
+  const onRead = async () => {
+    await readData(id);
+  };
+  const onUpdate = async () => {
+    await updateData({ id, title, description });
+  };
+  const onDelete = async () => {
+    await deleteData(id);
+  };
 
   return (
     <Container className='m-3 p-3'>

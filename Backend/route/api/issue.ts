@@ -47,9 +47,9 @@ router.post(
   }
 );
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response) => {
   try {
-    const issues = await Issue.find({});
+    const issues = await Issue.find({ id: req.params.id });
     return res.json({ data: issues });
   } catch (error) {
     return res.status(400).json({ errors: [{ msg: "Can't get issues" }] });
